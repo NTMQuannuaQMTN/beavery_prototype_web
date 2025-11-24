@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import reactLogo from '../assets/react.svg'
-import viteLogo from '/vite.svg'
+import beaveryLogo from '/beavery.svg'
 import '../App.css'
 
 function Landing() {
