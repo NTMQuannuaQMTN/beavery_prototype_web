@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Button from "@/components/Button";
 import BotBar from "./botbar";
+import IntroSplash from "@/components/IntroSplash";
 
 export default function Home() {
   return (
     <>
+      <IntroSplash duration={2000} />
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-8">
           <Image
