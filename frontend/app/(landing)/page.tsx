@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Button from "@/components/Button";
 
 export default function Home() {
   return (
@@ -17,9 +18,11 @@ export default function Home() {
         <input
           type="text"
           placeholder="eg. coffee in seoul"
-          className="w-full max-w-md rounded-lg border border-zinc-300 px-4 py-3 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-main focus:outline-none focus:ring-2 focus:ring-main/20"
+          className="w-full rounded-lg border border-graytext px-4 py-3 text-[16px] text-black font-medium placeholder:text-graytext focus:border-main focus:outline-none focus:ring-2 focus:ring-main/20"
         />
+        <Button>Log In</Button>
       </div>
     </div>
   );
 }
+
