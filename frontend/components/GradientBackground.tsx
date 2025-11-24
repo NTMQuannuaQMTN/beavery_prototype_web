@@ -9,7 +9,7 @@ export default function GradientBackground({
 }: GradientBackgroundProps) {
   return (
     <div
-      className={`bg-gradient-to-b from-blue-300 to-white ${className}`}
+      className={`bg-gradient-to-b from-main to-white ${className}`}
     >
       {children}
     </div>
