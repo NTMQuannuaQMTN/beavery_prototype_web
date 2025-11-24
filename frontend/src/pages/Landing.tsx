@@ -57,7 +57,7 @@ function Landing() {
     return (
         <>
             <div className='w-screen h-full justify-center items-center flex-col'>
-                <h1 className='text-4xl font-bold text-[#0D2755]'>WELCOME TO BEAVERY</h1>
+                <h1 className='text-4xl font-bold text-[#0D2755]'>WELCOME TO BEAVERY, bitch</h1>
                 <div className='flex flex-col justify-start items-start mt-4 gap-2 rounded-lg border-2 border-[#0D2755] p-2 mx-4'>
                     <h2 className='text-lg text-[#0D2755]'>What would you like to look for today?</h2>
                     <input className='mx-auto bg-white w-[98%] text-black p-1'></input>
