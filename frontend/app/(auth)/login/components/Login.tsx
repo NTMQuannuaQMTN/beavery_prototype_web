@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/Button";
+import Link from "next/link";
 
 interface LoginProps {
   email: string;
@@ -46,8 +47,19 @@ export default function Login({
         className={isLoading || isEmailEmpty ? "opacity-70" : ""} 
         disabled={isLoading || isEmailEmpty}
       >
-        {isLoading ? "Sending..." : "Send OTP"}
+        {isLoading ? "Sending..." : "Continue with email"}
       </Button>
+      <p className="text-[13px] text-graytext text-center">
+        By continuing, you are agreeing to Beavery Space's{" "}
+        <Link href="/terms" className="text-darkgraytext hover:underline">
+          Terms of Service
+        </Link>
+        {" "}and{" "}
+        <Link href="/privacy" className="text-darkgraytext hover:underline">
+          Privacy Policy
+        </Link>
+        .
+      </p>
     </form>
   );
 }

@@ -37,6 +37,26 @@ export default function AuthPage() {
     }
   };
 
+  const handleResendOtp = async () => {
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || "Failed to resend OTP. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +117,7 @@ export default function AuthPage() {
               setError(null);
               setOtp(["", "", "", "", "", ""]);
             }}
+            onResendOtp={handleResendOtp}
             isLoading={isLoading}
             error={error}
           />
