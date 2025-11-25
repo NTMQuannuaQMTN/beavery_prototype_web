@@ -3,12 +3,16 @@ import Link from "next/link";
 import Button from "@/components/Button";
 import BotBar from "./botbar";
 import IntroSplash from "@/components/IntroSplash";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Home() {
   return (
     <>
       <IntroSplash duration={2000} />
-      <div className="flex min-h-screen items-center justify-center bg-white">
+      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-background">
+        <div className="absolute top-6 right-6">
+          <ThemeToggle />
+        </div>
         <div className="flex flex-col items-center gap-8">
           <Image
             src="/logo/primaryblue.svg"

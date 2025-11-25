@@ -8,6 +8,17 @@
   --main: #00d9ff;
   --graytext: #94a3b8;
   --disabled: #e5e7eb;
+  --slatebg: #e2e8f0;
+}
+
+/* Dark theme */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --main: #00d9ff;
+  --graytext: #64748b;
+  --disabled: #374151;
+  --slatebg: #e2e8f0;
 }
 
 /* Tailwind Theme Tokens */
@@ -17,6 +28,7 @@
   --color-main: var(--main);
   --color-graytext: var(--graytext);
   --color-disabled: var(--disabled);
+  --color-slatebg: var(--slatebg);
   /* Fonts coming from Next.js */
   --font-sans: var(--font-manrope), system-ui, -apple-system, sans-serif;
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import MainBackground from "@/components/MainBackground";
 import Login from "./components/Login";
 import Verify from "./components/Verify";
 
@@ -65,7 +66,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-6 py-12">
+    <MainBackground className="flex min-h-screen items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Image
@@ -108,7 +109,7 @@ export default function AuthPage() {
           </div>
         )}
       </div>
-    </div>
+    </MainBackground>
   );
 }
 
