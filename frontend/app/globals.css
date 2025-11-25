@@ -13,6 +13,9 @@
   --slatebg: #e2e8f0;
   --link-hover: #000000;
   --toggle-hover: #cbd5e1;
+  --title-color: #000000;
+  --input-text: #000000;
+  --caret-color: #000000;
 }
 
 /* Dark theme */
@@ -27,6 +30,9 @@
   --slatebg: #e2e8f0;
   --link-hover: #ffffff;
   --toggle-hover: #1e293b;
+  --title-color: #ffffff;
+  --input-text: #ffffff;
+  --caret-color: #ffffff;
 }
 
 /* Tailwind Theme Tokens */
@@ -41,6 +47,9 @@
   --color-slatebg: var(--slatebg);
   --color-link-hover: var(--link-hover);
   --color-toggle-hover: var(--toggle-hover);
+  --color-title-color: var(--title-color);
+  --color-input-text: var(--input-text);
+  --color-caret-color: var(--caret-color);
   /* Fonts coming from Next.js */
   --font-sans: var(--font-manrope), system-ui, -apple-system, sans-serif;
 }
