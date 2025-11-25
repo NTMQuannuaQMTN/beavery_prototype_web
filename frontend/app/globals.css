@@ -7,6 +7,7 @@
   --foreground: #171717;
   --main: #00d9ff;
   --graytext: #94a3b8;
+  --disabled: #e5e7eb;
 }
 
 /* Tailwind Theme Tokens */
@@ -15,6 +16,7 @@
   --color-foreground: var(--foreground);
   --color-main: var(--main);
   --color-graytext: var(--graytext);
+  --color-disabled: var(--disabled);
   /* Fonts coming from Next.js */
   --font-sans: var(--font-manrope), system-ui, -apple-system, sans-serif;
 }
