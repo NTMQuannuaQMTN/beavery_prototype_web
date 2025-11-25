@@ -5,7 +5,7 @@ import Link from "next/link";
 import Button from "@/components/Button";
 import BotBar from "./botbar";
 import IntroSplash from "@/components/IntroSplash";
-import ThemeToggle from "@/components/ThemeToggle";
+// import ThemeToggle from "@/components/ThemeToggle";
 import MainBackground from "@/components/MainBackground";
 
 export default function Home() {
@@ -13,9 +13,9 @@ export default function Home() {
     <>
       <IntroSplash duration={2000} />
       <MainBackground className="flex min-h-screen items-center justify-center">
-        <div className="absolute top-6 right-6">
+        {/* <div className="absolute top-6 right-6">
           <ThemeToggle />
-        </div>
+        </div> */}
         <div className="flex flex-col items-center gap-8">
           <Image
             src="/logo/primaryblue.svg"
