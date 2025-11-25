@@ -1,20 +1,29 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import authRouter from "./routes/authRouter.js";
 
+// Load environment variables
+dotenv.config();
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3001; // Backend on 3001, Next.js on 3000
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Next.js default port
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
 app.use('/auth', authRouter);
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+
+// Health check
+app.get('/api', (req, res) => {
+    res.status(200).json({ message: 'Hello from Beavery backend!' });
 });
 
-app.get('/api', (req, res) => {
-    res.status(200).send('Hello from Beavery backend!');
+app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
 });
