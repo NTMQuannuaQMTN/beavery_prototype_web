@@ -1,6 +1,9 @@
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a href={href} className="text-[14px] text-graytext transition-all duration-100 hover:text-black">
+    <a 
+      href={href} 
+      className="text-[14px] text-graytext transition-all duration-100 hover:text-[var(--link-hover)]"
+    >
       {children}
     </a>
   );

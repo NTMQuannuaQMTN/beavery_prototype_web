@@ -8,7 +8,7 @@ export default function MainBackground({
   className = "",
 }: MainBackgroundProps) {
   return (
-    <div className={`bg-white ${className}`}>
+    <div className={`bg-background dark:bg-background ${className}`}>
       {children}
     </div>
   );
