@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Button from "@/components/Button";
 import BotBar from "./botbar";
 import IntroSplash from "@/components/IntroSplash";
@@ -24,7 +25,9 @@ export default function Home() {
             placeholder="eg. coffee in seoul"
             className="w-full rounded-lg border border-graytext px-4 py-3 text-[16px] text-black font-medium placeholder:text-graytext focus:border-main focus:outline-none focus:ring-2 focus:ring-main/20"
           />
-          <Button>Log In</Button>
+          <Link href="/login" className="w-full max-w-md">
+            <Button>Log In</Button>
+          </Link>
         </div>
       </div>
       <BotBar />
