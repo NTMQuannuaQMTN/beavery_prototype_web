@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import MainBackground from "@/components/MainBackground";
+import Toast from "@/components/Toast";
 import Login from "./components/Login";
 import Verify from "./components/Verify";
 
@@ -13,6 +14,15 @@ export default function AuthPage() {
   const [step, setStep] = useState<"email" | "otp" | "welcome">("email");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    if (error) {
+      setShowToast(true);
+    } else {
+      setShowToast(false);
+    }
+  }, [error]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,14 +59,56 @@ export default function AuthPage() {
         },
       });
 
-      if (error) throw error;
+      // Silently handle any errors - don't show toast for resend OTP
+      if (error) {
+        // Just log the error without showing toast
+        console.error("Resend OTP error:", error);
+      }
     } catch (err: any) {
-      setError(err.message || "Failed to resend OTP. Please try again.");
+      // Silently handle errors - don't show toast for resend OTP
+      console.error("Resend OTP error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
+
+  const classifyOtpError = (error: any): string => {
+    if (!error) return "Invalid OTP. Please try again.";
+    
+    // Get error message from various possible locations
+    const errorMessage = (
+      error.message || 
+      error.error?.message || 
+      error.toString()
+    )?.toLowerCase() || "";
+    
+    const errorCode = (
+      error.code || 
+      error.error?.code
+    )?.toLowerCase() || "";
+    
+    // Check for wrong OTP errors (covers expired, invalid, or wrong code)
+    if (
+      errorMessage.includes("invalid token") ||
+      errorMessage.includes("invalid otp") ||
+      errorMessage.includes("token mismatch") ||
+      errorMessage.includes("token has expired") ||
+      errorMessage.includes("expired or invalid") ||
+      errorMessage.includes("has expired") ||
+      errorMessage.includes("or invalid") ||
+      errorMessage.includes("invalid") ||
+      errorMessage.includes("expired") ||
+      errorCode === "token_expired" ||
+      errorCode === "invalid_token" ||
+      errorCode === "expired_token"
+    ) {
+      return "Oops, wrong code. Please try again!";
+    }
+    
+    // Return original error message or default fallback
+    return error.message || error.error?.message || "Invalid OTP. Please try again.";
+  };
 
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +129,7 @@ export default function AuthPage() {
       // Successfully authenticated
       setStep("welcome");
     } catch (err: any) {
-      setError(err.message || "Invalid OTP. Please try again.");
+      setError(classifyOtpError(err));
       // Clear OTP on error
       setOtp(["", "", "", "", "", ""]);
     } finally {
@@ -87,6 +139,18 @@ export default function AuthPage() {
 
   return (
     <MainBackground className="flex min-h-screen items-center justify-center px-6 py-12">
+      {error && (
+        <Toast
+          key={error}
+          message={error}
+          isVisible={showToast}
+          onClose={() => {
+            setShowToast(false);
+            setError(null);
+          }}
+          duration={2000}
+        />
+      )}
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
           <Image
@@ -104,7 +168,7 @@ export default function AuthPage() {
             setEmail={setEmail}
             onSubmit={handleEmailSubmit}
             isLoading={isLoading}
-            error={error}
+            error={null}
           />
         ) : step === "otp" ? (
           <Verify
@@ -115,11 +179,11 @@ export default function AuthPage() {
             onBackToEmail={() => {
               setStep("email");
               setError(null);
+              setShowToast(false);
               setOtp(["", "", "", "", "", ""]);
             }}
             onResendOtp={handleResendOtp}
             isLoading={isLoading}
-            error={error}
           />
         ) : (
           <div className="text-center space-y-6">

@@ -11,7 +11,6 @@ interface VerifyProps {
   onBackToEmail: () => void;
   onResendOtp: () => void;
   isLoading: boolean;
-  error: string | null;
 }
 
 export default function Verify({
@@ -22,7 +21,6 @@ export default function Verify({
   onBackToEmail,
   onResendOtp,
   isLoading,
-  error,
 }: VerifyProps) {
   const [countdown, setCountdown] = useState(0);
 
@@ -66,13 +64,8 @@ export default function Verify({
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-          {error}
-        </div>
-      )}
       <div>
-        <p className="mb-1 text-center text-sm text-graytext">
+        <p className="mb-1 text-center text-sm text-graytext font-medium">
           We sent a 6-digit code to
         </p>
         <p className="mb-6 text-center text-sm font-medium text-black">
@@ -102,24 +95,24 @@ export default function Verify({
       >
         {isLoading ? "Verifying..." : "Verify OTP"}
       </Button>
-      <div className="w-full text-center text-sm text-graytext">
+      <div className="w-full text-center text-sm text-black font-medium">
         Didn't receive the code?{" "}
         <button
           type="button"
           onClick={handleResendClick}
           disabled={isLoading || countdown > 0}
-          className="transition-colors cursor-pointer hover:text-black disabled:cursor-not-allowed disabled:hover:text-graytext"
+          className="transition-all duration-100 cursor-pointer hover:font-bold disabled:cursor-not-allowed disabled:text-graytext disabled:hover:font-medium"
         >
           Resend OTP
         </button>
-        {countdown > 0 && <span className="ml-1">in {countdown}s</span>}
+        {countdown > 0 && <span className="ml-1 text-graytext">in {countdown}s</span>}
       </div>
-      <div className="w-full text-center text-sm text-graytext">
+      <div className="w-full text-center text-sm text-black font-medium">
         <button
           type="button"
           onClick={onBackToEmail}
           disabled={isLoading}
-          className="inline-flex items-center gap-1.5 transition-colors cursor-pointer hover:text-black disabled:cursor-not-allowed disabled:hover:text-graytext"
+          className="inline-flex items-center gap-1.5 transition-all duration-100 cursor-pointer hover:font-bold disabled:cursor-not-allowed disabled:hover:text-graytext"
         >
           <ion-icon name="arrow-back" style={{ fontSize: "16px", display: "block" }}></ion-icon>
           Change email

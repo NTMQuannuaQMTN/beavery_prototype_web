@@ -49,13 +49,13 @@ export default function Login({
       >
         {isLoading ? "Sending..." : "Continue with email"}
       </Button>
-      <p className="text-[13px] text-graytext text-center">
+      <p className="text-[13px] text-graytext text-center font-medium">
         By continuing, you are agreeing to Beavery Space's{" "}
-        <Link href="/terms" className="text-darkgraytext hover:underline">
+        <Link href="/terms" className="font-medium text-darkgraytext hover:underline">
           Terms of Service
         </Link>
         {" "}and{" "}
-        <Link href="/privacy" className="text-darkgraytext hover:underline">
+        <Link href="/privacy" className="font-medium text-darkgraytext hover:underline">
           Privacy Policy
         </Link>
         .
