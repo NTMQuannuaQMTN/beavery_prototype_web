@@ -25,11 +25,11 @@ export default function AuthPage() {
     const checkExistingAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (session) {
           // User has a session, check if they have a name
           const { data: { user } } = await supabase.auth.getUser();
-          
+
           if (user?.email) {
             const { data: userData } = await supabase
               .from("users")
@@ -117,19 +117,19 @@ export default function AuthPage() {
 
   const classifyOtpError = (error: any): string => {
     if (!error) return "Invalid OTP. Please try again.";
-    
+
     // Get error message from various possible locations
     const errorMessage = (
-      error.message || 
-      error.error?.message || 
+      error.message ||
+      error.error?.message ||
       error.toString()
     )?.toLowerCase() || "";
-    
+
     const errorCode = (
-      error.code || 
+      error.code ||
       error.error?.code
     )?.toLowerCase() || "";
-    
+
     // Check for wrong OTP errors (covers expired, invalid, or wrong code)
     if (
       errorMessage.includes("invalid token") ||
@@ -147,7 +147,7 @@ export default function AuthPage() {
     ) {
       return "Oops, wrong code. Please try again!";
     }
-    
+
     // Return original error message or default fallback
     return error.message || error.error?.message || "Invalid OTP. Please try again.";
   };
@@ -226,7 +226,7 @@ export default function AuthPage() {
     try {
       // Get the access token for API authentication
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session?.access_token) {
         throw new Error("Session expired. Please sign in again.");
       }
@@ -235,20 +235,19 @@ export default function AuthPage() {
 
       // Call backend API to create user
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-      const response = await fetch(`${backendUrl}/auth/create-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: trimmedName }),
-      });
+      const axios = require('axios');
+      const response = await axios.post(
+        `${backendUrl}/auth/create-user`,
+        { name: trimmedName },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || data.details || "Failed to create account. Please try again.");
-      }
+      const data = response.data;
 
       // Clear OTP verification flag
       sessionStorage.removeItem("otp_verified");
@@ -342,20 +341,17 @@ export default function AuthPage() {
 
             {/* Progress Indicator */}
             <div className="flex items-center gap-2">
-              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                step === "email" || step === "otp" || step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
-              }`} />
-              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                step === "otp" || step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
-              }`} />
-              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
-              }`} />
+              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step === "email" || step === "otp" || step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+                }`} />
+              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step === "otp" || step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+                }`} />
+              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+                }`} />
             </div>
 
             {/* Form Content with Animation */}
             <div className="relative min-h-[300px]">
-              <div 
+              <div
                 key={step}
                 className="animate-fade-in"
               >
@@ -407,7 +403,7 @@ export default function AuthPage() {
         <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden rounded-2xl m-4">
           {/* Vibrant gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-main/20 via-main/10 to-main/5 dark:from-main/30 dark:via-main/20 dark:to-main/10" />
-          
+
           {/* Decorative floating elements */}
           <div className="absolute inset-0 overflow-hidden">
             {/* Code-like symbols floating */}
@@ -427,13 +423,13 @@ export default function AuthPage() {
               {"=>"}
             </div>
           </div>
-          
+
           {/* Decorative blur circles */}
           <div className="absolute inset-0">
             <div className="absolute top-0 right-0 w-96 h-96 bg-main rounded-full blur-3xl opacity-20 dark:opacity-30" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-main rounded-full blur-3xl opacity-20 dark:opacity-30" />
           </div>
-          
+
           {/* Content area */}
           <div className="relative z-10 w-full h-full flex items-center justify-center p-12">
             <div className="w-full max-w-md mx-auto rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl p-12 text-center space-y-6">
