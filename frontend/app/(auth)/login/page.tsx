@@ -35,6 +35,8 @@ export default function AuthPage() {
               .eq("email", user.email)
               .maybeSingle();
 
+            console.log(userData);
+
             if (userData && userData.name && userData.name.trim()) {
               // User is authenticated and has a name, redirect to home
               router.replace("/home");
