@@ -18,7 +18,9 @@ export const verifyAuth = async (req, res, next) => {
     const { data: { user }, error } = await supabaseAuth.auth.getUser(token);
 
     if (error || !user) {
-      return res.status(401).json({ error: 'Invalid or expired token' });
+      return res.status(401).json({ 
+        error: 'Invalid or expired token'
+      });
     }
 
     // Attach user to request object
@@ -26,7 +28,9 @@ export const verifyAuth = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    return res.status(401).json({ error: 'Authentication failed' });
+    return res.status(401).json({ 
+      error: 'Authentication failed'
+    });
   }
 };
 

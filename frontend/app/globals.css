@@ -115,3 +115,72 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Loading icon animations */
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes compass-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.animate-compass-spin {
+  animation: compass-spin 2s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes compass-glow {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.animate-compass-glow {
+  animation: compass-glow 2s ease-in-out infinite;
+}
+
+@keyframes swirl {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(var(--swirl-radius, 28px)) rotate(0deg);
+    opacity: 0.6;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) translateX(var(--swirl-radius, 28px)) rotate(-180deg);
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(var(--swirl-radius, 28px)) rotate(-360deg);
+    opacity: 0.6;
+  }
+}
+
+.animate-swirl {
+  animation: swirl 2s ease-in-out infinite;
+  --swirl-radius: 28px;
+}
