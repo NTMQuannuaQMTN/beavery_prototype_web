@@ -8,12 +8,14 @@ import MainBackground from "@/components/MainBackground";
 import Toast from "@/components/Toast";
 import Login from "./components/Login";
 import Verify from "./components/Verify";
+import Info from "./components/Info";
 
 export default function AuthPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [step, setStep] = useState<"email" | "otp" | "welcome">("email");
+  const [name, setName] = useState("");
+  const [step, setStep] = useState<"email" | "otp" | "info" | "welcome">("email");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
@@ -173,7 +175,7 @@ export default function AuthPage() {
         .from("users")
         .select("email, name")
         .eq("email", email)
-        .single();
+        .maybeSingle();
 
       // Check if user exists and has a name
       if (userData && userData.name && userData.name.trim()) {
@@ -182,14 +184,14 @@ export default function AuthPage() {
         sessionStorage.removeItem("otp_verified_timestamp");
         router.push("/home");
       } else {
-        // User doesn't exist or doesn't have a name, go to create account page
-        router.push("/login/create");
+        // User doesn't exist or doesn't have a name, go to info step
+        setStep("info");
       }
     } catch (err: any) {
-      // If it's a database error (user not found), redirect to create page
+      // If it's a database error (user not found), go to info step
       if (err.code === "PGRST116") {
         // No rows returned - user doesn't exist
-        router.push("/login/create");
+        setStep("info");
       } else if (err.message?.includes("Invalid token") || err.message?.includes("expired")) {
         // OTP verification error
         setError(classifyOtpError(err));
@@ -201,6 +203,59 @@ export default function AuthPage() {
         // Clear OTP on error
         setOtp(["", "", "", "", "", ""]);
       }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInfoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      setError("Please enter your name");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Get the access token for API authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error("Session expired. Please sign in again.");
+      }
+
+      const token = session.access_token;
+
+      // Call backend API to create user
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/auth/create-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: trimmedName }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || "Failed to create account. Please try again.");
+      }
+
+      // Clear OTP verification flag
+      sessionStorage.removeItem("otp_verified");
+      sessionStorage.removeItem("otp_verified_timestamp");
+
+      // Redirect to home page after successful setup
+      router.push("/home");
+    } catch (err: any) {
+      setError(err.message || "Failed to set up your account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -238,7 +293,7 @@ export default function AuthPage() {
               </div>
               <div className="space-y-2">
                 <h1 className="text-3xl lg:text-4xl font-bold text-black dark:text-white transition-all duration-300">
-                  {step === "email" ? "Welcome back" : step === "otp" ? "Verify your email" : "Hey, welcome!"}
+                  {step === "email" ? "Welcome back" : step === "otp" ? "Verify your email" : step === "info" ? "How should we call you?" : "Hey, welcome!"}
                 </h1>
                 <div className="transition-all duration-300">
                   {step === "email" ? (
@@ -254,6 +309,10 @@ export default function AuthPage() {
                         {email}
                       </p>
                     </div>
+                  ) : step === "info" ? (
+                    <p className="text-black text-[18px] font-bold">
+                      How should we call you?
+                    </p>
                   ) : (
                     <p className="text-black text-[18px] font-bold">
                       You've successfully signed in.
@@ -266,10 +325,13 @@ export default function AuthPage() {
             {/* Progress Indicator */}
             <div className="flex items-center gap-2">
               <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                step === "email" || step === "otp" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+                step === "email" || step === "otp" || step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
               }`} />
               <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                step === "otp" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+                step === "otp" || step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+              }`} />
+              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                step === "info" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
               }`} />
             </div>
 
@@ -302,6 +364,14 @@ export default function AuthPage() {
                     onResendOtp={handleResendOtp}
                     isLoading={isLoading}
                   />
+                ) : step === "info" ? (
+                  <Info
+                    name={name}
+                    setName={setName}
+                    onSubmit={handleInfoSubmit}
+                    isLoading={isLoading}
+                    error={error}
+                  />
                 ) : (
                   <div className="text-center space-y-6">
                     <div className="space-y-2">
@@ -315,29 +385,46 @@ export default function AuthPage() {
           </div>
         </div>
 
-        {/* Right side - Reserved for future content with subtle design */}
-        <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden">
-          {/* Subtle gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-main/5 via-transparent to-main/10 dark:from-main/10 dark:via-transparent dark:to-main/20" />
+        {/* Right side - Bold vibrant design */}
+        <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden rounded-2xl m-4">
+          {/* Vibrant gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-main/20 via-main/10 to-main/5 dark:from-main/30 dark:via-main/20 dark:to-main/10" />
           
-          {/* Decorative pattern */}
-          <div className="absolute inset-0 opacity-5 dark:opacity-10">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-main rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-main rounded-full blur-3xl" />
+          {/* Decorative floating elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Code-like symbols floating */}
+            <div className="absolute top-20 left-10 text-main/20 dark:text-main/30 text-4xl font-mono animate-pulse" style={{ animationDelay: "0s" }}>
+              {"</>"}
+            </div>
+            <div className="absolute top-40 right-16 text-main/20 dark:text-main/30 text-3xl font-mono animate-pulse" style={{ animationDelay: "0.5s" }}>
+              {"{}"}
+            </div>
+            <div className="absolute bottom-32 left-20 text-main/20 dark:text-main/30 text-5xl font-mono animate-pulse" style={{ animationDelay: "1s" }}>
+              {"()"}
+            </div>
+            <div className="absolute top-60 right-24 text-main/20 dark:text-main/30 text-2xl font-mono animate-pulse" style={{ animationDelay: "1.5s" }}>
+              {"[]"}
+            </div>
+            <div className="absolute bottom-20 right-12 text-main/20 dark:text-main/30 text-4xl font-mono animate-pulse" style={{ animationDelay: "2s" }}>
+              {"=>"}
+            </div>
           </div>
           
-          {/* Border divider */}
-          <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
+          {/* Decorative blur circles */}
+          <div className="absolute inset-0">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-main rounded-full blur-3xl opacity-20 dark:opacity-30" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-main rounded-full blur-3xl opacity-20 dark:opacity-30" />
+          </div>
           
-          {/* Placeholder content area */}
+          {/* Content area */}
           <div className="relative z-10 w-full h-full flex items-center justify-center p-12">
-            <div className="text-center space-y-4 opacity-30 dark:opacity-20">
-              <div className="w-24 h-24 mx-auto rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center">
-                <svg className="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-full max-w-md mx-auto rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl p-12 text-center space-y-6">
+              <div className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-main/10 to-main/5 dark:from-main/20 dark:to-main/10 border-2 border-main/20 dark:border-main/30 flex items-center justify-center">
+                <svg className="w-16 h-16 text-main" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-sm text-graytext font-medium">Content area</p>
+              <p className="text-sm text-graytext dark:text-gray-300 font-medium">Content area</p>
             </div>
           </div>
         </div>
