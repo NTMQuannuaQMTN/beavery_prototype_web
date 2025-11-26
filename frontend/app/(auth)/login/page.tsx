@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import MainBackground from "@/components/MainBackground";
 import Toast from "@/components/Toast";
@@ -9,6 +10,7 @@ import Login from "./components/Login";
 import Verify from "./components/Verify";
 
 export default function AuthPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [step, setStep] = useState<"email" | "otp" | "welcome">("email");
@@ -126,8 +128,8 @@ export default function AuthPage() {
 
       if (error) throw error;
 
-      // Successfully authenticated
-      setStep("welcome");
+      // Successfully authenticated - redirect to create account page
+      router.push("/login/create");
     } catch (err: any) {
       setError(classifyOtpError(err));
       // Clear OTP on error
