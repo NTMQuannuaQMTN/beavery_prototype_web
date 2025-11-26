@@ -236,7 +236,7 @@ export default function AuthPage() {
       // Call backend API to create user
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
       const axios = require('axios');
-      const response = await axios.post(
+      await axios.post(
         `${backendUrl}/auth/create-user`,
         { name: trimmedName },
         {
@@ -246,8 +246,6 @@ export default function AuthPage() {
           },
         }
       );
-
-      const data = response.data;
 
       // Clear OTP verification flag
       sessionStorage.removeItem("otp_verified");
