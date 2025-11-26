@@ -26,18 +26,18 @@ export default function CreateAccountPage() {
         
         // Check if verification flag exists and is recent (within 5 minutes)
         if (!otpVerified || !otpTimestamp) {
-          // No verification flag - redirect to login
-          router.replace("/login");
+          // No verification flag - redirect to landing page
+          router.replace("/");
           return;
         }
 
         const timestamp = parseInt(otpTimestamp, 10);
         const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
         if (Date.now() - timestamp > fiveMinutes) {
-          // Verification flag expired - redirect to login
+          // Verification flag expired - redirect to landing page
           sessionStorage.removeItem("otp_verified");
           sessionStorage.removeItem("otp_verified_timestamp");
-          router.replace("/login");
+          router.replace("/");
           return;
         }
 
@@ -45,8 +45,8 @@ export default function CreateAccountPage() {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError || !session) {
-          // No valid session - redirect to login
-          router.replace("/login");
+          // No valid session - redirect to landing page
+          router.replace("/");
           return;
         }
 
@@ -54,8 +54,8 @@ export default function CreateAccountPage() {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError || !user || !user.email) {
-          // Invalid user - redirect to login
-          router.replace("/login");
+          // Invalid user - redirect to landing page
+          router.replace("/");
           return;
         }
 
@@ -69,7 +69,7 @@ export default function CreateAccountPage() {
         // If database query failed, don't allow access
         if (dbError) {
           console.error("Database check error:", dbError);
-          router.replace("/login");
+          router.replace("/");
           return;
         }
 
@@ -85,8 +85,8 @@ export default function CreateAccountPage() {
         setIsCheckingAuth(false);
       } catch (err) {
         console.error("Auth check error:", err);
-        // On any unexpected error, redirect to login for safety
-        router.replace("/login");
+        // On any unexpected error, redirect to landing page for safety
+        router.replace("/");
       }
     };
 

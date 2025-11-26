@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import Button from "@/components/Button";
 
 export default function HomePage() {
   const router = useRouter();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -15,8 +17,8 @@ export default function HomePage() {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError || !session) {
-          // No valid session - redirect to login
-          router.replace("/login");
+          // No valid session - redirect to landing page
+          router.replace("/");
           return;
         }
 
@@ -24,8 +26,8 @@ export default function HomePage() {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError || !user) {
-          // Invalid user - redirect to login
-          router.replace("/login");
+          // Invalid user - redirect to landing page
+          router.replace("/");
           return;
         }
 
@@ -33,13 +35,37 @@ export default function HomePage() {
         setIsCheckingAuth(false);
       } catch (err) {
         console.error("Auth check error:", err);
-        // On any unexpected error, redirect to login for safety
-        router.replace("/login");
+        // On any unexpected error, redirect to landing page for safety
+        router.replace("/");
       }
     };
 
     checkAuthentication();
   }, [router]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      // Clear session storage
+      sessionStorage.clear();
+      
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Logout error:", error);
+      }
+      
+      // Redirect to landing page
+      router.replace("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+      // Still redirect even if there's an error
+      router.replace("/");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   // Show loading state while checking authentication
   if (isCheckingAuth) {
@@ -52,7 +78,16 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <h1 className="text-3xl font-bold text-black">Hello World</h1>
+      <div className="flex flex-col items-center gap-6">
+        <h1 className="text-3xl font-bold text-black">Hello World</h1>
+        <Button 
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className={isLoggingOut ? "opacity-70" : ""}
+        >
+          {isLoggingOut ? "Logging out..." : "Log Out"}
+        </Button>
+      </div>
     </div>
   );
 }

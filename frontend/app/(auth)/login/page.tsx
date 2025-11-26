@@ -18,6 +18,42 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
+  // Check if user is already authenticated on page load
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          // User has a session, check if they have a name
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user?.email) {
+            const { data: userData } = await supabase
+              .from("users")
+              .select("email, name")
+              .eq("email", user.email)
+              .maybeSingle();
+
+            if (userData && userData.name && userData.name.trim()) {
+              // User is authenticated and has a name, redirect to home
+              router.replace("/home");
+            } else {
+              // User is authenticated but no name, redirect to create page
+              // But they need OTP verification flag, so redirect to landing instead
+              router.replace("/");
+            }
+          }
+        }
+      } catch (err) {
+        // If check fails, continue with login flow
+        console.error("Auth check error:", err);
+      }
+    };
+
+    checkExistingAuth();
+  }, [router]);
+
   useEffect(() => {
     if (error) {
       setShowToast(true);
