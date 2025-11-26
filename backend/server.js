@@ -16,6 +16,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Request logging middleware (optional - remove if too verbose)
+// app.use((req, res, next) => {
+//   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+//   next();
+// });
+
 // Routes
 app.use('/auth', authRouter);
 
@@ -24,6 +30,26 @@ app.get('/api', (req, res) => {
     res.status(200).json({ message: 'Hello from Beavery backend!' });
 });
 
+// Error handling middleware (must be last)
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    details: err.message || 'An unexpected error occurred'
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.path}`);
+  res.status(404).json({ 
+    error: 'Route not found',
+    path: req.path
+  });
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
+    console.log(`Health check: http://localhost:${port}/api`);
+    console.log(`Auth routes: http://localhost:${port}/auth/*`);
 });

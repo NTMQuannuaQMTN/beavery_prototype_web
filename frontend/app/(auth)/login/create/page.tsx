@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import MainBackground from "@/components/MainBackground";
 import Toast from "@/components/Toast";
 import Button from "@/components/Button";
+import LoadingIcon from "@/components/LoadingIcon";
 
 export default function CreateAccountPage() {
   const [name, setName] = useState("");
@@ -115,12 +116,6 @@ export default function CreateAccountPage() {
     }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user || !user.email) {
-        throw new Error("User not authenticated");
-      }
-
       // Get the access token for API authentication
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -130,7 +125,7 @@ export default function CreateAccountPage() {
 
       const token = session.access_token;
 
-      // Call backend API to create/update user
+      // Call backend API to create user
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
       const response = await fetch(`${backendUrl}/auth/create-user`, {
         method: 'POST',
@@ -144,7 +139,7 @@ export default function CreateAccountPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to set up your account. Please try again.");
+        throw new Error(data.error || data.details || "Failed to create account. Please try again.");
       }
 
       // Clear OTP verification flag
@@ -177,7 +172,7 @@ export default function CreateAccountPage() {
             />
           </div>
           <div className="text-center">
-            <p className="text-graytext">Checking authentication...</p>
+            <LoadingIcon text="Checking authentication..." />
           </div>
         </div>
       </MainBackground>
