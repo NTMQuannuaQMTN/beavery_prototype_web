@@ -207,7 +207,7 @@ export default function AuthPage() {
   };
 
   return (
-    <MainBackground className="flex min-h-screen items-center justify-center px-6 py-12">
+    <MainBackground className="min-h-screen">
       {error && (
         <Toast
           key={error}
@@ -220,48 +220,127 @@ export default function AuthPage() {
           duration={2000}
         />
       )}
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
-          <Image
-            src="/logo/primaryblue.svg"
-            alt="Beavery logo"
-            width={180}
-            height={54}
-            priority
-          />
-        </div>
+      <div className="flex min-h-screen">
+        {/* Left side - Interactive content */}
+        <div className="flex w-full lg:w-1/2 items-center justify-center px-6 py-12 lg:px-12 lg:py-16">
+          <div className="w-full max-w-md space-y-8">
+            {/* Logo and Header */}
+            <div className="space-y-4">
+              <div className="flex justify-start">
+                <Image
+                  src="/logo/primaryblue.svg"
+                  alt="Beavery logo"
+                  width={160}
+                  height={48}
+                  priority
+                  className="transition-opacity duration-300"
+                />
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-3xl lg:text-4xl font-bold text-black dark:text-white transition-all duration-300">
+                  {step === "email" ? "Welcome back" : step === "otp" ? "Verify your email" : "Hey, welcome!"}
+                </h1>
+                <div className="transition-all duration-300">
+                  {step === "email" ? (
+                    <p className="text-black text-[18px] font-bold">
+                      Enter your email to get started
+                    </p>
+                  ) : step === "otp" ? (
+                    <div className="space-y-1">
+                      <p className="text-black text-[18px] font-bold">
+                        We've sent a 6-digit code to your email
+                      </p>
+                      <p className="text-graytext text-[16px] font-medium">
+                        {email}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-black text-[18px] font-bold">
+                      You've successfully signed in.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
 
-        {step === "email" ? (
-          <Login
-            email={email}
-            setEmail={setEmail}
-            onSubmit={handleEmailSubmit}
-            isLoading={isLoading}
-            error={null}
-          />
-        ) : step === "otp" ? (
-          <Verify
-            email={email}
-            otp={otp}
-            setOtp={setOtp}
-            onSubmit={handleOtpSubmit}
-            onBackToEmail={() => {
-              setStep("email");
-              setError(null);
-              setShowToast(false);
-              setOtp(["", "", "", "", "", ""]);
-            }}
-            onResendOtp={handleResendOtp}
-            isLoading={isLoading}
-          />
-        ) : (
-          <div className="text-center space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-black">Hey, welcome!</h1>
-              <p className="text-graytext">You've successfully signed in.</p>
+            {/* Progress Indicator */}
+            <div className="flex items-center gap-2">
+              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                step === "email" || step === "otp" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+              }`} />
+              <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                step === "otp" ? "bg-main" : "bg-gray-200 dark:bg-gray-700"
+              }`} />
+            </div>
+
+            {/* Form Content with Animation */}
+            <div className="relative min-h-[300px]">
+              <div 
+                key={step}
+                className="animate-fade-in"
+              >
+                {step === "email" ? (
+                  <Login
+                    email={email}
+                    setEmail={setEmail}
+                    onSubmit={handleEmailSubmit}
+                    isLoading={isLoading}
+                    error={null}
+                  />
+                ) : step === "otp" ? (
+                  <Verify
+                    email={email}
+                    otp={otp}
+                    setOtp={setOtp}
+                    onSubmit={handleOtpSubmit}
+                    onBackToEmail={() => {
+                      setStep("email");
+                      setError(null);
+                      setShowToast(false);
+                      setOtp(["", "", "", "", "", ""]);
+                    }}
+                    onResendOtp={handleResendOtp}
+                    isLoading={isLoading}
+                  />
+                ) : (
+                  <div className="text-center space-y-6">
+                    <div className="space-y-2">
+                      <h1 className="text-3xl font-bold text-black dark:text-white">Hey, welcome!</h1>
+                      <p className="text-graytext">You've successfully signed in.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* Right side - Reserved for future content with subtle design */}
+        <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative overflow-hidden">
+          {/* Subtle gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-main/5 via-transparent to-main/10 dark:from-main/10 dark:via-transparent dark:to-main/20" />
+          
+          {/* Decorative pattern */}
+          <div className="absolute inset-0 opacity-5 dark:opacity-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-main rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-main rounded-full blur-3xl" />
+          </div>
+          
+          {/* Border divider */}
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
+          
+          {/* Placeholder content area */}
+          <div className="relative z-10 w-full h-full flex items-center justify-center p-12">
+            <div className="text-center space-y-4 opacity-30 dark:opacity-20">
+              <div className="w-24 h-24 mx-auto rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center">
+                <svg className="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-sm text-graytext font-medium">Content area</p>
+            </div>
+          </div>
+        </div>
       </div>
     </MainBackground>
   );

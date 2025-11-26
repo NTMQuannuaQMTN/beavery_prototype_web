@@ -65,12 +65,6 @@ export default function Verify({
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div>
-        <p className="mb-1 text-center text-sm text-graytext font-medium">
-          We sent a 6-digit code to
-        </p>
-        <p className="mb-6 text-center text-sm font-medium text-black">
-          {email}
-        </p>
         <div className="flex justify-center gap-3">
           {otp.map((digit, index) => (
             <input

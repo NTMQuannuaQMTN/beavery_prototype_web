@@ -25,7 +25,7 @@ export default function Home() {
             priority
           />
           <h1 className="text-4xl font-extrabold" style={{ color: 'var(--title-color)' }}>
-            Welcome to Beavery
+            Welcome to Beavery, biyaaatch
           </h1>
           <input
             type="text"
@@ -33,7 +33,7 @@ export default function Home() {
             className="w-full rounded-lg border border-graytext px-4 py-3 text-[16px] font-medium placeholder:text-graytext focus:border-main focus:outline-none focus:ring-2 focus:ring-main/20"
             style={{ color: 'var(--input-text)', caretColor: 'var(--input-text)' }}
           />
-          <Link href="/login" className="w-full max-w-md">
+          <Link href="/login" className="">
             <Button>Log In</Button>
           </Link>
         </div>

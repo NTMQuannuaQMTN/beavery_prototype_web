@@ -6,7 +6,7 @@ export default function Header() {
     <div className="flex items-center p-6">
       <Link href="/">
         <Image
-          src="/logo/primaryblack.svg"
+          src="/logo/primary.svg"
           alt="Beavery logo"
           width={140}
           height={40}

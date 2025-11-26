@@ -14,7 +14,7 @@ export default function BotBar() {
     <div className="fixed bottom-0 left-0 right-0 p-8">
       <div className="mx-auto flex w-full items-center justify-between">
         <p className="text-[14px] text-graytext font-medium">
-          &copy; {new Date().getFullYear()} Beavery Space.
+          &copy; {new Date().getFullYear()} Beavery Space. All rights reserved.
         </p>
         <div className="flex items-center gap-8">
           <FooterLink href="/terms">Terms</FooterLink>
