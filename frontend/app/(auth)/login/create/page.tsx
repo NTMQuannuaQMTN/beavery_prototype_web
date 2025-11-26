@@ -39,7 +39,7 @@ export default function CreateAccountPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) {
+      if (!user || !user.email) {
         throw new Error("User not authenticated");
       }
 
@@ -50,7 +50,30 @@ export default function CreateAccountPage() {
 
       if (updateError) throw updateError;
 
-      // TODO: Update user profile in database if needed
+      // Create a new row in the public.users table
+      const { error: insertError } = await supabase
+        .from("users")
+        .insert({
+          email: user.email,
+          name: trimmedName,
+          created_at: new Date().toISOString(),
+        });
+
+      if (insertError) {
+        // Check if it's a unique constraint error (user already exists)
+        if (insertError.code === "23505") {
+          // User already exists, just update the name
+          const { error: updateDbError } = await supabase
+            .from("users")
+            .update({ name: trimmedName })
+            .eq("email", user.email);
+
+          if (updateDbError) throw updateDbError;
+        } else {
+          throw insertError;
+        }
+      }
+
       // Redirect to home page after successful setup
       router.push("/home");
     } catch (err: any) {

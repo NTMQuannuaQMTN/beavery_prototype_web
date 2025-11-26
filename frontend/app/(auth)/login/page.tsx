@@ -128,12 +128,37 @@ export default function AuthPage() {
 
       if (error) throw error;
 
-      // Successfully authenticated - redirect to create account page
-      router.push("/login/create");
+      // Successfully authenticated - check if user exists in database
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("email, name")
+        .eq("email", email)
+        .single();
+
+      // Check if user exists and has a name
+      if (userData && userData.name && userData.name.trim()) {
+        // User already has a name, go straight to home
+        router.push("/home");
+      } else {
+        // User doesn't exist or doesn't have a name, go to create account page
+        router.push("/login/create");
+      }
     } catch (err: any) {
-      setError(classifyOtpError(err));
-      // Clear OTP on error
-      setOtp(["", "", "", "", "", ""]);
+      // If it's a database error (user not found), redirect to create page
+      if (err.code === "PGRST116") {
+        // No rows returned - user doesn't exist
+        router.push("/login/create");
+      } else if (err.message?.includes("Invalid token") || err.message?.includes("expired")) {
+        // OTP verification error
+        setError(classifyOtpError(err));
+        // Clear OTP on error
+        setOtp(["", "", "", "", "", ""]);
+      } else {
+        // Other errors - show error message
+        setError(err.message || "An error occurred. Please try again.");
+        // Clear OTP on error
+        setOtp(["", "", "", "", "", ""]);
+      }
     } finally {
       setIsLoading(false);
     }
