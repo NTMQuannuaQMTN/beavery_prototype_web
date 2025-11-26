@@ -128,6 +128,10 @@ export default function AuthPage() {
 
       if (error) throw error;
 
+      // Mark that OTP verification was just completed (for create page access)
+      sessionStorage.setItem("otp_verified", "true");
+      sessionStorage.setItem("otp_verified_timestamp", Date.now().toString());
+
       // Successfully authenticated - check if user exists in database
       const { data: userData, error: userError } = await supabase
         .from("users")
@@ -138,6 +142,8 @@ export default function AuthPage() {
       // Check if user exists and has a name
       if (userData && userData.name && userData.name.trim()) {
         // User already has a name, go straight to home
+        sessionStorage.removeItem("otp_verified");
+        sessionStorage.removeItem("otp_verified_timestamp");
         router.push("/home");
       } else {
         // User doesn't exist or doesn't have a name, go to create account page

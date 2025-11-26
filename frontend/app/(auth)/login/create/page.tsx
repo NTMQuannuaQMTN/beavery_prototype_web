@@ -13,7 +13,85 @@ export default function CreateAccountPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const router = useRouter();
+
+  // Check authentication on page load
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        // First check if OTP was just verified (prevents direct URL access)
+        const otpVerified = sessionStorage.getItem("otp_verified");
+        const otpTimestamp = sessionStorage.getItem("otp_verified_timestamp");
+        
+        // Check if verification flag exists and is recent (within 5 minutes)
+        if (!otpVerified || !otpTimestamp) {
+          // No verification flag - redirect to login
+          router.replace("/login");
+          return;
+        }
+
+        const timestamp = parseInt(otpTimestamp, 10);
+        const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+        if (Date.now() - timestamp > fiveMinutes) {
+          // Verification flag expired - redirect to login
+          sessionStorage.removeItem("otp_verified");
+          sessionStorage.removeItem("otp_verified_timestamp");
+          router.replace("/login");
+          return;
+        }
+
+        // Check if there's a valid session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          // No valid session - redirect to login
+          router.replace("/login");
+          return;
+        }
+
+        // Verify the session is still valid
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user || !user.email) {
+          // Invalid user - redirect to login
+          router.replace("/login");
+          return;
+        }
+
+        // Check if user already exists in database with a name
+        const { data: existingUser, error: dbError } = await supabase
+          .from("users")
+          .select("email, name")
+          .eq("email", user.email)
+          .maybeSingle(); // Use maybeSingle to handle no rows gracefully
+
+        // If database query failed, don't allow access
+        if (dbError) {
+          console.error("Database check error:", dbError);
+          router.replace("/login");
+          return;
+        }
+
+        // If user exists and has a name, redirect to home (already completed setup)
+        if (existingUser && existingUser.name && existingUser.name.trim()) {
+          sessionStorage.removeItem("otp_verified");
+          sessionStorage.removeItem("otp_verified_timestamp");
+          router.replace("/home");
+          return;
+        }
+
+        // User is authenticated, OTP verified, and doesn't have a name yet - allow access
+        setIsCheckingAuth(false);
+      } catch (err) {
+        console.error("Auth check error:", err);
+        // On any unexpected error, redirect to login for safety
+        router.replace("/login");
+      }
+    };
+
+    checkAuthentication();
+  }, [router]);
 
   useEffect(() => {
     if (error) {
@@ -69,6 +147,10 @@ export default function CreateAccountPage() {
         throw new Error(data.error || "Failed to set up your account. Please try again.");
       }
 
+      // Clear OTP verification flag
+      sessionStorage.removeItem("otp_verified");
+      sessionStorage.removeItem("otp_verified_timestamp");
+
       // Redirect to home page after successful setup
       router.push("/home");
     } catch (err: any) {
@@ -79,6 +161,28 @@ export default function CreateAccountPage() {
   };
 
   const isNameEmpty = !name.trim();
+
+  // Show loading state while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <MainBackground className="flex min-h-screen items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="mb-8 flex justify-center">
+            <Image
+              src="/logo/primaryblue.svg"
+              alt="Beavery logo"
+              width={180}
+              height={54}
+              priority
+            />
+          </div>
+          <div className="text-center">
+            <p className="text-graytext">Checking authentication...</p>
+          </div>
+        </div>
+      </MainBackground>
+    );
+  }
 
   return (
     <MainBackground className="flex min-h-screen items-center justify-center px-6 py-12">
