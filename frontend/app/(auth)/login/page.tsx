@@ -302,8 +302,24 @@ export default function AuthPage() {
                     </p>
                   ) : step === "otp" ? (
                     <div className="space-y-1">
+                      <div className="pb-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStep("email");
+                            setError(null);
+                            setShowToast(false);
+                            setOtp(["", "", "", "", "", ""]);
+                          }}
+                          disabled={isLoading}
+                          className="inline-flex items-center gap-1.5 text-sm text-black font-medium transition-all duration-100 cursor-pointer hover:font-bold disabled:cursor-not-allowed disabled:hover:text-graytext"
+                        >
+                          <ion-icon name="arrow-back" style={{ fontSize: "14px", display: "block" }}></ion-icon>
+                          Change email
+                        </button>
+                      </div>
                       <p className="text-black text-[18px] font-bold">
-                        We've sent a 6-digit code to your email
+                        We've sent a 6-digit code to your email!
                       </p>
                       <p className="text-graytext text-[16px] font-medium">
                         {email}

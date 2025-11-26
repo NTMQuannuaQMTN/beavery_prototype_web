@@ -101,17 +101,6 @@ export default function Verify({
         </button>
         {countdown > 0 && <span className="ml-1 text-graytext">in {countdown}s</span>}
       </div>
-      <div className="w-full text-center text-sm text-black font-medium">
-        <button
-          type="button"
-          onClick={onBackToEmail}
-          disabled={isLoading}
-          className="inline-flex items-center gap-1.5 transition-all duration-100 cursor-pointer hover:font-bold disabled:cursor-not-allowed disabled:hover:text-graytext"
-        >
-          <ion-icon name="arrow-back" style={{ fontSize: "16px", display: "block" }}></ion-icon>
-          Change email
-        </button>
-      </div>
     </form>
   );
 }
