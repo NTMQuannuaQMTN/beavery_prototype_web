@@ -43,35 +43,30 @@ export default function CreateAccountPage() {
         throw new Error("User not authenticated");
       }
 
-      // Update user metadata with name
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { name: trimmedName }
+      // Get the access token for API authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error("Session expired. Please sign in again.");
+      }
+
+      const token = session.access_token;
+
+      // Call backend API to create/update user
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/auth/create-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: trimmedName }),
       });
 
-      if (updateError) throw updateError;
+      const data = await response.json();
 
-      // Create a new row in the public.users table
-      const { error: insertError } = await supabase
-        .from("users")
-        .insert({
-          email: user.email,
-          name: trimmedName,
-          created_at: new Date().toISOString(),
-        });
-
-      if (insertError) {
-        // Check if it's a unique constraint error (user already exists)
-        if (insertError.code === "23505") {
-          // User already exists, just update the name
-          const { error: updateDbError } = await supabase
-            .from("users")
-            .update({ name: trimmedName })
-            .eq("email", user.email);
-
-          if (updateDbError) throw updateDbError;
-        } else {
-          throw insertError;
-        }
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to set up your account. Please try again.");
       }
 
       // Redirect to home page after successful setup
