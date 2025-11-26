@@ -86,7 +86,7 @@ export default function HomePage() {
   if (isCheckingAuth) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <LoadingIcon text="Loading..." />
+        <LoadingIcon size="sm" />
       </div>
     );
   }

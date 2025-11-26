@@ -172,7 +172,7 @@ export default function CreateAccountPage() {
             />
           </div>
           <div className="text-center">
-            <LoadingIcon text="Checking authentication..." />
+            <LoadingIcon />
           </div>
         </div>
       </MainBackground>
