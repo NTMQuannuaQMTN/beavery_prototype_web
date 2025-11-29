@@ -58,7 +58,7 @@ export default function Login({
         <Link href="/privacy" className="font-medium text-darkgraytext hover:underline">
           Privacy Policy
         </Link>
-        .
+        {" "}and giving us consent to send you emails.
       </p>
     </form>
   );

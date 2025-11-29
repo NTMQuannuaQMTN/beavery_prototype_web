@@ -89,13 +89,13 @@ export default function Verify({
       >
         {isLoading ? "Verifying..." : "Verify OTP"}
       </Button>
-      <div className="w-full text-center text-sm text-black font-medium">
+      <div className="w-full text-center text-sm text-graytext font-medium">
         Didn't receive the code?{" "}
         <button
           type="button"
           onClick={handleResendClick}
           disabled={isLoading || countdown > 0}
-          className="transition-all duration-100 cursor-pointer hover:font-bold disabled:cursor-not-allowed disabled:text-graytext disabled:hover:font-medium"
+          className="transition-all duration-100 text-black cursor-pointer hover:font-bold disabled:cursor-not-allowed disabled:text-graytext disabled:hover:font-medium"
         >
           Resend OTP
         </button>
