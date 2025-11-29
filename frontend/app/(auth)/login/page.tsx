@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import { supabase } from "@/lib/supabase";
 import MainBackground from "@/components/MainBackground";
 import Toast from "@/components/Toast";
@@ -235,7 +236,6 @@ export default function AuthPage() {
 
       // Call backend API to create user
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-      const axios = require('axios');
       await axios.post(
         `${backendUrl}/auth/create-user`,
         { name: trimmedName },
